@@ -163,3 +163,30 @@ def updateFood(request, pk):
 
     return render(request, 'addFood.html', context)
 
+#profile page of user
+@login_required
+def ProfilePage(request):
+    person = Profile.objects.filter(personOf=request.user).last()
+    foodItems = Food.objects.filter(personOf=request.user)
+    form = ProfileForm(instance=person)
+
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, instance=person)
+
+        if form.is_valid():
+            form.save()
+            return redirect('profile')
+
+    else:
+        form = ProfileForm(instance=person)
+
+    someDayLastWeek = timezone.now().date() - timedelta(days=7)
+    records = Profile.objects.filter(date__gte=someDayLastWeek, date__lt=timezone.now().date(), personOf=request.user)
+
+    context = {
+        'form': form,
+        'foodItems': foodItems,
+        'records': records
+    }
+
+    return render(request, 'profile.html', context)
