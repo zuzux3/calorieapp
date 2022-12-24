@@ -162,6 +162,15 @@ def updateFood(request, pk):
     }
 
     return render(request, 'addFood.html', context)
+@login_required
+def deleteFood(request,pk):
+	food_item = Food.objects.get(id=pk)
+	if request.method == "POST":
+		food_item.delete()
+		return redirect('profile')
+	context = {'food':food_item,}
+	return render(request,'delete_food.html',context)
+
 
 #profile page of user
 @login_required
